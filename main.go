@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
+	"regexp"
 
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/log"
@@ -20,6 +23,16 @@ func failf(msg string, args ...interface{}) {
 	os.Exit(1)
 }
 
+func hasAnalyzeError(cmdOutput string) bool {
+	// example: error • Undefined class 'function' • lib/package.dart:3:1 • undefined_class
+	analyzeErrorPattern := regexp.MustCompile(`error.+\.dart:\d+:\d+`)
+	if analyzeErrorPattern.MatchString(cmdOutput) {
+		return true
+	}
+
+	return false
+}
+
 func main() {
 	var cfg config
 	if err := stepconf.Parse(&cfg); err != nil {
@@ -35,16 +48,23 @@ func main() {
 	fmt.Println()
 	log.Infof("Running analyze")
 
+	var b bytes.Buffer
+	multiwr := io.MultiWriter(os.Stdout, &b)
 	analyzeCmd := command.New("flutter", append([]string{"analyze"}, additionalParams...)...).
-		SetStdout(os.Stdout).
-		SetStderr(os.Stderr).
-		SetDir(cfg.ProjectLocation)
+		SetDir(cfg.ProjectLocation).
+		SetStdout(multiwr).
+		SetStderr(os.Stderr)
 
 	fmt.Println()
 	log.Donef("$ %s", analyzeCmd.PrintableCommandArgs())
 	fmt.Println()
-
+	
 	if err := analyzeCmd.Run(); err != nil {
-		failf("Running command failed, error: %s", err)
+		log.Errorf("Error running flutter analyze: %s", err)
+		os.Exit(1)
+	}
+
+	if hasAnalyzeError(b.String()) {
+		os.Exit(1)
 	}
 }
