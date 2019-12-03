@@ -60,11 +60,9 @@ func main() {
 	fmt.Println()
 	
 	if err := analyzeCmd.Run(); err != nil {
-		log.Errorf("Error running flutter analyze: %s", err)
-		os.Exit(1)
-	}
-
-	if hasAnalyzeError(b.String()) {
-		os.Exit(1)
+		if hasAnalyzeError(b.String()) {
+			log.Errorf("flutter analyze found errors: %s", err)
+			os.Exit(1)
+		}
 	}
 }
