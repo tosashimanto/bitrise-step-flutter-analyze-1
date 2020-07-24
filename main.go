@@ -13,9 +13,16 @@ import (
 	shellquote "github.com/kballard/go-shellquote"
 )
 
+var severityRegExp = map[string]string{
+	"error":   "error",
+	"warning": "(error|warning)",
+	"info":    "(error|warning|info)",
+}
+
 type config struct {
 	AdditionalParams string `env:"additional_params"`
 	ProjectLocation  string `env:"project_location,dir"`
+	FailSeverity     string `env:"fail_severity,opt[error,warning,info]"`
 }
 
 func failf(msg string, args ...interface{}) {
@@ -23,9 +30,11 @@ func failf(msg string, args ...interface{}) {
 	os.Exit(1)
 }
 
-func hasAnalyzeError(cmdOutput string) bool {
+func hasAnalyzeError(cmdOutput string, failSeverity string) bool {
 	// example: error • Undefined class 'function' • lib/package.dart:3:1 • undefined_class
-	analyzeErrorPattern := regexp.MustCompile(`error.+\.dart:\d+:\d+`)
+	severityPattern := severityRegExp[failSeverity]
+	pattern := fmt.Sprintf(`%s.+\.dart:\d+:\d+`, severityPattern)
+	analyzeErrorPattern := regexp.MustCompile(pattern)
 	if analyzeErrorPattern.MatchString(cmdOutput) {
 		return true
 	}
@@ -58,9 +67,9 @@ func main() {
 	fmt.Println()
 	log.Donef("$ %s", analyzeCmd.PrintableCommandArgs())
 	fmt.Println()
-	
+
 	if err := analyzeCmd.Run(); err != nil {
-		if hasAnalyzeError(b.String()) {
+		if hasAnalyzeError(b.String(), cfg.FailSeverity) {
 			log.Errorf("flutter analyze found errors: %s", err)
 			os.Exit(1)
 		}

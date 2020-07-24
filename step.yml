@@ -21,6 +21,16 @@ inputs:
       summary: "The root dir of your Flutter project."
       description: "The root dir of your Flutter project."
       is_required: true
+  - fail_severity: "error"
+    opts:
+      title: "Fail Severity"
+      summary: "The minimum severity to fail the step, any issue with a severity at least as high as the specified one will make the step fail."
+      description: "The minimum severity to fail the step, any issue with a severity at least as high as the specified one will make the step fail."
+      is_required: true
+      value_options:
+        - "error"
+        - "warning"
+        - "info"
   - additional_params: 
     opts:
       title: "Additional Parameters"
