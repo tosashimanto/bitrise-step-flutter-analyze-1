@@ -1,6 +1,28 @@
 title: Flutter Analyze
-summary: This step will run `flutter analyze` command in a Flutter project
-description: This step will run `flutter analyze` command in a Flutter project
+summary: This Step runs the `flutter analyze` command in a Flutter project.
+description: |-
+
+  The `flutter analyze` command is a wrapper around the [dartanalyzer](https://pub.dev/packages/analyzer) tool. It performs static analysis of your code. Check out the [available analysis options](https://github.com/flutter/flutter/blob/master/analysis_options.yaml) in the Flutter repository.
+
+  ### Configuring the Step
+
+  1. Set the **Project Location** input to the source directory of your app.
+
+     By default, you do not have to change this.
+
+  1. Add any flags you want to the `flutter analyze` command in the **Additional Parameters** input.
+
+     Run `flutter analyze --help` to check out the available flags. For example, you can set a flag so that the command only shows an output when there are some errors, warnings, hints or lints.
+
+  ### Useful links
+
+  - [Getting started with Flutter apps](https://devcenter.bitrise.io/getting-started/getting-started-with-flutter-apps/)
+
+  ### Related Steps
+
+  - [Flutter Install](https://www.bitrise.io/integrations/steps/flutter-installer)
+  - [Flutter Build](https://www.bitrise.io/integrations/steps/flutter-build)
+  - [Flutter Test](https://www.bitrise.io/integrations/steps/flutter-test)
 website: https://github.com/bitrise-steplib/bitrise-step-flutter-analyze
 source_code_url: https://github.com/bitrise-steplib/bitrise-step-flutter-analyze
 support_url: https://github.com/bitrise-steplib/bitrise-step-flutter-analyze/issues
