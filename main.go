@@ -72,6 +72,8 @@ func main() {
 		if hasAnalyzeError(b.String(), cfg.FailSeverity) {
 			log.Errorf("flutter analyze found errors: %s", err)
 			os.Exit(1)
+		} else {
+			failf("step failed with error: %s", err)
 		}
 	}
 }
