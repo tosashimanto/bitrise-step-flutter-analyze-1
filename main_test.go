@@ -79,3 +79,32 @@ func TestHasAnalyzeError(t *testing.T) {
 		}
 	}
 }
+
+func TestHasOtherError(t *testing.T) {
+	cases := []struct {
+		title     string
+		cmdOutput string
+		want      bool
+	}{
+		{
+			"contains other error",
+			`step failed
+			 failed
+			`,
+			true,
+		},
+		{
+			"contains error and info level violation",
+			`info • Unused import: 'dart:math' • lib/package.dart:3:8 • unused_import
+			error • Expected to find ';' • lib/package.dart:3:8 • expected_token
+			`,
+			false,
+		},
+	}
+
+	for _, tt := range cases {
+		if got := hasOtherError(tt.cmdOutput); got != tt.want {
+			t.Errorf("%s: got %t want %t", tt.title, got, tt.want)
+		}
+	}
+}

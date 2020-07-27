@@ -35,11 +35,12 @@ func hasAnalyzeError(cmdOutput string, failSeverity string) bool {
 	severityPattern := severityRegExp[failSeverity]
 	pattern := fmt.Sprintf(`%s.+\.dart:\d+:\d+`, severityPattern)
 	analyzeErrorPattern := regexp.MustCompile(pattern)
-	if analyzeErrorPattern.MatchString(cmdOutput) {
-		return true
-	}
+	return analyzeErrorPattern.MatchString(cmdOutput)
+}
 
-	return false
+func hasOtherError(cmdOutput string) bool {
+	analyzeErrorPattern := regexp.MustCompile(`(error|warning|info).+\.dart:\d+:\d+`)
+	return !analyzeErrorPattern.MatchString(cmdOutput)
 }
 
 func main() {
@@ -72,7 +73,7 @@ func main() {
 		if hasAnalyzeError(b.String(), cfg.FailSeverity) {
 			log.Errorf("flutter analyze found errors: %s", err)
 			os.Exit(1)
-		} else {
+		} else if hasOtherError(b.String()) {
 			failf("step failed with error: %s", err)
 		}
 	}
