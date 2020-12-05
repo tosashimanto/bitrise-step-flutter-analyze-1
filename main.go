@@ -19,6 +19,7 @@ const (
 	warningLevel = "warning"
 	infoLevel    = "info"
 
+	// newLine = "\r\n|\n\r|\n|\r"
 	newLine = "\n"
 )
 
@@ -47,9 +48,12 @@ func constructRegex(severityPattern string) *regexp.Regexp {
 func hasAnalyzeError(cmdOutput string, failSeverity string) bool {
 	// example: error • Undefined class 'function' • lib/package.dart:3:1 • undefined_class
 	outputLines := strings.Split(cmdOutput, newLine)
+
 	analyzeErrorPattern := constructRegex(severityRegExp[failSeverity])
 
-	for _, line := range outputLines {
+	for i, line := range outputLines {
+		st := strings.TrimSpace(line)
+		fmt.Println(i+1, ":", st)
 		if analyzeErrorPattern.MatchString(strings.TrimSpace(line)) {
 			return true
 		}
@@ -75,7 +79,7 @@ func main() {
 	}
 
 	fmt.Println()
-	log.Infof("Running analyze")
+	log.Infof("Running analyze for bitrise-step-flutter-analyze-1")
 
 	var b bytes.Buffer
 	multiwr := io.MultiWriter(os.Stdout, &b)
@@ -96,4 +100,5 @@ func main() {
 			failf("step failed with error: %s", err)
 		}
 	}
+	log.Infof("Complete analyze for bitrise-step-flutter-analyze-1")
 }
